@@ -1,0 +1,60 @@
+name: 🐛 Bug Report
+description: 버그를 제보합니다
+title: "[Bug] "
+labels: ["type: bug", "status: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        버그 제보 감사합니다. 재현 가능한 정보를 최대한 채워주세요.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 요약
+      description: 어떤 일이 일어났나요?
+      placeholder: 한 줄 요약
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 단계
+      description: 어떻게 재현할 수 있나요?
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 환경
+      description: OS, 브라우저, 버전 등
+      placeholder: |
+        - OS:
+        - Browser/Runtime:
+        - Version:
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 추가 정보
+      description: 스크린샷, 로그, 관련 이슈 등
