@@ -1,0 +1,54 @@
+name: Claude Code Review (reusable)
+
+# PR 자동 리뷰. 입력 prompt 로 리뷰 톤을 조절할 수 있음.
+#
+# Caller workflow 예:
+#
+#   on:
+#     pull_request:
+#       types: [opened, synchronize, ready_for_review, reopened]
+#   jobs:
+#     review:
+#       uses: swayloop/.github/.github/workflows/claude-review.yml@main
+#       secrets: inherit
+#       permissions:
+#         contents: read
+#         pull-requests: write
+#         issues: write
+#         id-token: write
+#
+# 필요한 secret: CLAUDE_CODE_OAUTH_TOKEN
+
+on:
+  workflow_call:
+    inputs:
+      prompt:
+        description: "리뷰 프롬프트 (생략하면 기본 한국어 리뷰)"
+        required: false
+        type: string
+        default: |
+          이 PR의 변경사항을 리뷰해줘.
+          코드 품질, 버그 가능성, 개선 사항을 확인하고 코멘트로 남겨줘.
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN:
+        required: true
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ inputs.prompt }}

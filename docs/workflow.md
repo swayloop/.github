@@ -103,7 +103,25 @@ jobs:
 | `claude-review.yml` | PR 자동 코드 리뷰 | PR opened/sync |
 | `claude-mention.yml` | `@claude` 멘션 응답 | comment/issue |
 
-> TODO: 이 reusable workflow 들을 아직 `swayloop/.github` 에 옮기지 않았습니다. UXResearchEngine 에 있는 동일 파일들을 마이그레이션 예정.
+호출 방식 (caller 가 트리거를 가짐, 호출되는 쪽은 `workflow_call`):
+
+```yaml
+# 예: 각 레포의 .github/workflows/release.yml
+name: Release
+on:
+  push:
+    branches: [main]
+jobs:
+  release:
+    uses: swayloop/.github/.github/workflows/release-please.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      release-type: node
+```
+
+각 워크플로우의 입력/시크릿/permission 은 파일 상단 주석에 명시되어 있습니다.
 
 ## 결정해야 할 것 (TODO)
 
