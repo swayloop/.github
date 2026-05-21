@@ -122,9 +122,24 @@ jobs:
 
 각 워크플로우의 입력/시크릿/permission 은 파일 상단 주석에 명시되어 있습니다.
 
-## 결정해야 할 것 (TODO)
+## 브랜치 보호
 
-- [ ] 브랜치 보호 규칙: main 에 required reviewers, required status checks 강제할지 (solo 작업이라 self-review 허용 필요)
-- [ ] dev 브랜치도 보호할지
-- [ ] CHANGELOG.md 위치: 레포 루트 (release-please 기본)
-- [ ] Squash 외에 rebase merge 도 허용할지
+org 의 public 레포에는 [`scripts/apply-rulesets.sh`](../scripts/apply-rulesets.sh) 으로 다음 ruleset 이 적용됩니다.
+
+**`main` (default branch)**
+- PR 강제 (직접 push 불가)
+- Force push 금지
+- 삭제 금지
+- Linear history (squash/rebase only, merge commit 금지)
+- Required reviewers / status checks 없음 — solo self-merge 허용
+
+**`dev`**
+- Force push 금지
+- 삭제 금지
+
+신규 레포 생성 후 다음 한 줄로 적용:
+```bash
+swayloop-.github/scripts/apply-rulesets.sh swayloop/<new-repo>
+```
+
+> Private 레포는 GitHub Free 플랜에서 ruleset 미지원 (Pro/Team 이상 필요).
