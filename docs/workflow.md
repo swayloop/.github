@@ -100,7 +100,6 @@ jobs:
 |---|---|---|
 | `release-please.yml` | 릴리즈 PR 자동 생성 | main push |
 | `auto-close-issues.yml` | PR 머지 시 이슈 자동 close | PR closed |
-| `claude-review.yml` | PR 자동 코드 리뷰 | PR opened/sync |
 | `claude-mention.yml` | `@claude` 멘션 응답 | comment/issue |
 
 호출 방식 (caller 가 트리거를 가짐, 호출되는 쪽은 `workflow_call`):
