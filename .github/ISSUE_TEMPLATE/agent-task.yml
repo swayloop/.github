@@ -1,6 +1,6 @@
-name: 🤖 Task
+name: 🤖 Agent Task
 description: 에이전트 친화적 작업 이슈 (분해된 sub-task 또는 명확한 단일 작업)
-title: "[Task] "
+title: "[Agent Task] "
 labels: ["status: triage"]
 body:
   - type: markdown
