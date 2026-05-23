@@ -17,6 +17,8 @@
 | `type:` | bug / feature / chore / docs / refactor | ✅ 1개 |
 | `priority:` | p0 / p1 / p2 / p3 | 트리아지 후 ✅ |
 | `status:` | triage / in-progress / blocked / needs-review | 상태에 따라 |
+| `agent:` | claude / codex / any — 에이전트 라우팅 (Task 양식 dropdown 매핑) | Task 양식만 |
+| `parent-task` / `sub-task` / `parallel-ok` | 분해/병렬화 메타 | Task 양식만 |
 | `area:` | 개별 레포에서 확장 (e.g. `area: auth`, `area: ui`) | 선택 |
 | community | `good first issue`, `help wanted` | 선택 |
 
@@ -26,6 +28,27 @@
 - **p1** — 이번 주 안에 끝낼 일.
 - **p2** — 이번 사이클(보통 2주) 안에.
 - **p3** — Backlog. 언젠가.
+
+## 이슈 양식
+
+세 가지 양식 (`.github/ISSUE_TEMPLATE/`):
+
+| 양식 | 용도 | 작성 주체 |
+|---|---|---|
+| `bug_report.yml` | 버그 제보 | 사람 |
+| `feature_request.yml` | 기능 요청 | 사람 |
+| `agent-task.yml` | **에이전트 친화 작업** (분해된 sub-task 또는 명확한 단일 작업) | 사람 or 코디네이터 에이전트 |
+
+`agent-task.yml` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
+- 수용 기준 (Acceptance Criteria) — binary 체크리스트
+- 스코프 in/out (Constraints)
+- 관련 파일/심볼
+- 의존성 (blocked-by)
+- Test plan
+- Agent Routing (dropdown: claude/codex/any → `agent:` 라벨 자동 매핑)
+- Budget hint (model + max_iterations)
+
+자동 검증/분해 워크플로우 ([swayloop/.github#8](https://github.com/swayloop/.github/issues/8)) 가 새 이슈 생성 시 본문을 검증하고, 큰 작업은 `agent-task.yml` 구조로 sub-issue 자동 분해.
 
 ## 트리아지
 
