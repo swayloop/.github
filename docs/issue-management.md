@@ -37,9 +37,9 @@
 |---|---|---|
 | `bug_report.yml` | 버그 제보 | 사람 |
 | `feature_request.yml` | 기능 요청 | 사람 |
-| `task.yml` | **에이전트 친화 작업** (분해된 sub-task 또는 명확한 단일 작업) | 사람 or 코디네이터 에이전트 |
+| `agent-task.yml` | **에이전트 친화 작업** (분해된 sub-task 또는 명확한 단일 작업) | 사람 or 코디네이터 에이전트 |
 
-`task.yml` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
+`agent-task.yml` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
 - 수용 기준 (Acceptance Criteria) — binary 체크리스트
 - 스코프 in/out (Constraints)
 - 관련 파일/심볼
@@ -48,7 +48,7 @@
 - Agent Routing (dropdown: claude/codex/any → `agent:` 라벨 자동 매핑)
 - Budget hint (model + max_iterations)
 
-자동 검증/분해 워크플로우 ([swayloop/.github#8](https://github.com/swayloop/.github/issues/8)) 가 새 이슈 생성 시 본문을 검증하고, 큰 작업은 `task.yml` 구조로 sub-issue 자동 분해.
+자동 검증/분해 워크플로우 ([swayloop/.github#8](https://github.com/swayloop/.github/issues/8)) 가 새 이슈 생성 시 본문을 검증하고, 큰 작업은 `agent-task.yml` 구조로 sub-issue 자동 분해.
 
 ## 트리아지
 
