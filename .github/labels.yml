@@ -53,6 +53,28 @@
   color: "0e8a16"
   description: "리뷰 대기"
 
+# --- agent routing ---
+- name: "agent: claude"
+  color: "8957e5"
+  description: "Claude Code 가 처리할 작업"
+- name: "agent: codex"
+  color: "2da44e"
+  description: "Codex 가 처리할 작업"
+- name: "agent: any"
+  color: "c5def5"
+  description: "아무 에이전트 가능"
+
+# --- task decomposition ---
+- name: "parent-task"
+  color: "5319e7"
+  description: "분해 필요 (sub-task 들로 쪼개짐)"
+- name: "sub-task"
+  color: "bfd4f2"
+  description: "parent 에서 분해된 sub-task"
+- name: "parallel-ok"
+  color: "0e8a16"
+  description: "여러 워커 병렬 처리 가능"
+
 # --- community ---
 - name: "good first issue"
   color: "7057ff"

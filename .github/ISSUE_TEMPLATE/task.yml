@@ -1,0 +1,98 @@
+name: 🤖 Task
+description: 에이전트 친화적 작업 이슈 (분해된 sub-task 또는 명확한 단일 작업)
+title: "[Task] "
+labels: ["status: triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        에이전트가 자동 처리할 수 있게 가능한 정보를 채워주세요.
+        필수 (요약/수용 기준) 만으로도 OK, 나머지는 채우면 정확도 ↑.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 요약
+      description: 무엇을, 왜
+      placeholder: 한두 문장
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 수용 기준 (Acceptance Criteria)
+      description: 에이전트가 "끝났다" 판단할 binary 체크리스트
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope_in
+    attributes:
+      label: 스코프 — 다룰 것
+      description: 이 작업이 손댈 영역
+      placeholder: |
+        - 파일/모듈/기능 등
+
+  - type: textarea
+    id: scope_out
+    attributes:
+      label: 스코프 — 다루지 말 것 (Constraints)
+      description: 만지면 안 되는 영역. scope creep 방지
+      placeholder: |
+        - 리팩토링/스타일 변경은 별도 이슈
+        - 다른 모듈 X
+
+  - type: textarea
+    id: related_files
+    attributes:
+      label: 관련 파일 / 심볼
+      description: 워커의 탐색 시간 단축용
+      placeholder: |
+        - src/...
+        - functionName
+
+  - type: input
+    id: blocked_by
+    attributes:
+      label: 의존성 (blocked by)
+      description: 먼저 끝나야 할 다른 이슈 번호
+      placeholder: "#43, #44"
+
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: Test Plan
+      description: 어떻게 검증할지
+      placeholder: |
+        - 기존 테스트 통과
+        - 새 케이스: ...
+
+  - type: dropdown
+    id: agent_routing
+    attributes:
+      label: Agent Routing
+      description: 어느 에이전트가 처리하면 좋을지 (자동 워크플로우가 라벨로 변환)
+      options:
+        - any
+        - claude
+        - codex
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: budget
+    attributes:
+      label: Budget Hint
+      description: 모델 / 최대 iteration (runaway 방지)
+      placeholder: "haiku / sonnet / opus, max_iterations=10"
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 추가 정보
+      description: 참고 링크, 스크린샷, parent 이슈 번호 등
