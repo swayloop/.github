@@ -96,7 +96,7 @@ swayloop 현재 단계 = 멀티 에이전트 워크플로우 표준화 + 자동�
 ### 향후 작업
 
 - `~/.claude/commands/worktree.md` 등 슬래시 커맨드로 workmux 자동화 layer 구축
-- `agent_task.yml` 이슈 템플릿 (이슈 #2) → 슬래시 커맨드 입력 포맷
+- 이슈 본문 구조 표준화 (이슈 #2) → 슬래시 커맨드 입력 포맷
 - swayloop 표준 (`<type>/<issue#>-<desc>` 브랜치 명명, Conventional Commits) 을 workmux config 와 슬래시 커맨드에 박기
 
 ## 재평가 트리거
