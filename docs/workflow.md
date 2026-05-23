@@ -2,6 +2,8 @@
 
 swayloop org 의 공통 개발 워크플로우입니다. 새 레포는 이 흐름을 따르세요.
 
+> 멀티 에이전트 (Claude Code + Codex) 작업 흐름은 [agent-workflow.md](./agent-workflow.md) 참고.
+
 ## 브랜치 전략
 
 ```
