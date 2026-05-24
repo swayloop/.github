@@ -1,0 +1,46 @@
+name: Sync Labels (reusable)
+
+# Reusable workflow. Caller repositories can sync labels from swayloop/.github:
+#
+#   on:
+#     workflow_dispatch:
+#     schedule:
+#       - cron: "0 0 * * *"
+#   jobs:
+#     labels:
+#       uses: swayloop/.github/.github/workflows/sync-labels.yml@main
+#       permissions:
+#         issues: write
+#
+# The labels source is swayloop/.github/.github/labels.yml.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_call:
+    inputs:
+      labels-path:
+        description: "Path to labels.yml inside swayloop/.github"
+        required: false
+        type: string
+        default: ".github/labels.yml"
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout swayloop standards
+        uses: actions/checkout@v4
+        with:
+          repository: swayloop/.github
+          ref: main
+          path: standards
+
+      - name: Sync labels
+        working-directory: standards
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/sync-labels.mjs --repo "${{ github.repository }}" --labels "${{ inputs.labels-path }}"
