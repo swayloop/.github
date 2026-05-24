@@ -64,9 +64,24 @@ solo 작업 중에는 가볍게 — `type` + `priority` 만 확실히 잡으면 
 
 ## 라벨 동기화
 
-org 전체에 동일한 라벨을 유지하려면 [github-label-sync](https://github.com/Financial-Times/github-label-sync) 또는 [crazy-max/ghaction-github-labeler](https://github.com/crazy-max/ghaction-github-labeler) 를 각 레포에서 cron 으로 돌리는 방식이 일반적.
+org 전체 라벨 기준은 `.github/labels.yml` 입니다. 각 레포는 reusable workflow 로 기준 라벨을 동기화합니다.
 
-> TODO: 자동 동기화 워크플로우를 `.github/workflows/sync-labels.yml` 로 추가하고, 각 레포가 cron 으로 그걸 호출하는 구조로 갈지 결정.
+```yaml
+# .github/workflows/sync-labels.yml
+name: Sync Labels
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  labels:
+    uses: swayloop/.github/.github/workflows/sync-labels.yml@main
+    permissions:
+      issues: write
+```
+
+동기화는 기준 라벨을 create/update 합니다. 레포별 custom `area:` 라벨이나 GitHub 기본 라벨을 삭제하지 않습니다.
 
 ## Org-wide Project
 

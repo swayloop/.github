@@ -14,5 +14,5 @@ swayloop org 공통 표준 메타 repo. ISSUE_TEMPLATE / labels / reusable workf
 | 릴리즈 자동화 | [docs/changelog-automation.md](docs/changelog-automation.md) |
 | 새 레포 표준 | [docs/project-standards.md](docs/project-standards.md) |
 | ISSUE_TEMPLATE / labels | [.github/](.github/) |
-| Reusable GitHub Actions | [.github/workflows/](.github/workflows/) (release-please, claude-mention, auto-close-issues) |
+| Reusable GitHub Actions | [.github/workflows/](.github/workflows/) (release-please, claude-mention, auto-close-issues, sync-labels) |
 | 브랜치 보호 스크립트 | [scripts/apply-rulesets.sh](scripts/apply-rulesets.sh) |
