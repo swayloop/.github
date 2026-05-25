@@ -56,9 +56,30 @@ GitHub 이슈를 사람이 작성 → Claude Code 에서 `/issue <N>` 트리거 
 
 핵심 분리: **오케스트레이터는 코드 안 읽음**. 단순 dispatcher. 실제 일은 워커가 함. 덕분에 메인 세션 컨텍스트가 더러워지지 않고 토큰 효율도 좋음.
 
+## 현재 상태
+
+이 플로우는 현재 **부분 보류** 상태다.
+
+workmux 를 표준 오케스트레이션 도구로 채택하는 방향은 유지한다. 다만 workmux 기반 dispatch 를 모든 repo 의 운영 표준으로 강제하는 것은 아직 보류한다.
+
+`/issue` 슬래시 커맨드는 별도로 만든다. 이 커맨드의 1차 책임은 **GitHub 이슈를 읽고, 이슈별 격리 worktree + tmux/workmux 세션을 할당하는 것**이다. 실제 구현/머지 자동화는 단계적으로 붙인다.
+
+세션 단위는 이슈 1개를 기본으로 하되, 큰 이슈를 sub-task 이슈로 쪼개고 sub-task 별로 별도 세션을 할당하는 방식은 아직 보류한다.
+
 ## 슬래시 커맨드: `/issue`
 
 `~/.claude/skills/issue/SKILL.md` (글로벌). swayloop 표준 어댑터.
+
+### 책임
+
+`/issue` 는 작업을 직접 해결하는 커맨드가 아니라 **세션 할당 커맨드**다.
+
+1. GitHub 이슈를 읽는다.
+2. 라벨/제목으로 브랜치명을 정한다.
+3. 이슈 본문과 repo 규칙으로 워커 prompt 를 만든다.
+4. 이슈별 worktree 를 만든다.
+5. 이슈별 tmux/workmux 세션을 할당한다.
+6. 선택된 에이전트(Claude 또는 Codex)에 prompt 를 주입한다.
 
 ### 인자 형식
 
@@ -83,6 +104,30 @@ GitHub 이슈를 사람이 작성 → Claude Code 에서 `/issue <N>` 트리거 
 브랜치명 형식: `<type>/<issue#>-<short-slug>` ([workflow.md 의 네이밍 규칙](./workflow.md#브랜치-네이밍-규칙)).
 
 라벨이 없거나 모호하면 **오케스트레이터가 사용자에게 물어봄** (추측 금지).
+
+### 세션 할당 규칙
+
+세션 이름/handle 은 브랜치명에서 파생한다.
+
+```text
+Issue: 3
+Branch: docs/3-workmux-standard-setup
+Session handle: docs-3-workmux-standard-setup
+```
+
+기본 할당:
+
+```bash
+workmux add docs/3-workmux-standard-setup -b -P <prompt-file> -a claude
+```
+
+Codex 로 강제:
+
+```bash
+workmux add docs/3-workmux-standard-setup -b -P <prompt-file> -a codex
+```
+
+같은 이슈 번호로 이미 열린 workmux 세션이 있으면 중복 생성하지 않는다. 기본은 기존 세션에 attach 하고, 새 세션이 필요하면 사용자에게 확인한다.
 
 ## 사람이 워커 보는 법
 
