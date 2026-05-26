@@ -35,11 +35,22 @@
 
 | 양식 | 용도 | 작성 주체 |
 |---|---|---|
-| `bug_report.yml` | 버그 제보 | 사람 |
-| `feature_request.yml` | 기능 요청 | 사람 |
-| `agent-task.yml` | **에이전트 친화 작업** (분해된 sub-task 또는 명확한 단일 작업) | 사람 or 코디네이터 에이전트 |
+| `bug_report.yml` | 버그 제보 | 사람 (웹 UI) |
+| `feature_request.yml` | 기능 요청 | 사람 (웹 UI) |
+| `agent-task.md` | **에이전트 친화 작업** (분해된 sub-task 또는 명확한 단일 작업) | 사람 or 에이전트 (CLI/웹 둘 다 OK) |
 
-`agent-task.yml` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
+> `agent-task` 만 markdown 인 이유: 에이전트가 터미널에서 `gh issue create` 로 만들 때 form (`.yml`) 은 빈 body 로 시작됨. markdown template 은 에이전트가 파일을 읽고 섹션을 채워 `--body-file` 로 전달할 수 있어서 CLI 친화적.
+
+**에이전트가 이슈 만들 때:**
+```bash
+# 1. 템플릿 읽고 섹션 채운 임시 파일 작성
+cp .github/ISSUE_TEMPLATE/agent-task.md /tmp/issue-body.md
+# (에이전트가 /tmp/issue-body.md 의 frontmatter 제거 + 각 섹션의 <!-- --> 안내를 실제 내용으로 교체)
+# 2. 이슈 생성
+gh issue create --title "[Agent Task] ..." --body-file /tmp/issue-body.md --label "status: triage"
+```
+
+`agent-task.md` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
 - 수용 기준 (Acceptance Criteria) — binary 체크리스트
 - 스코프 in/out (Constraints)
 - 관련 파일/심볼
@@ -48,7 +59,7 @@
 - Agent Routing (dropdown: claude/codex/any → `agent:` 라벨 자동 매핑)
 - Budget hint (model + max_iterations)
 
-자동 검증/분해 워크플로우 ([swayloop/.github#8](https://github.com/swayloop/.github/issues/8)) 가 새 이슈 생성 시 본문을 검증하고, 큰 작업은 `agent-task.yml` 구조로 sub-issue 자동 분해.
+자동 검증/분해 워크플로우 ([swayloop/.github#8](https://github.com/swayloop/.github/issues/8)) 가 새 이슈 생성 시 본문을 검증하고, 큰 작업은 `agent-task.md` 구조로 sub-issue 자동 분해.
 
 ## 트리아지
 
