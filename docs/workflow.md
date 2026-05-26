@@ -134,7 +134,8 @@ org 의 public 레포에는 [`scripts/apply-rulesets.sh`](../scripts/apply-rules
 - Force push 금지
 - 삭제 금지
 - Linear history (squash/rebase only, merge commit 금지)
-- Required reviewers / status checks 없음 — solo self-merge 허용
+- Required status check: `pr-source-branch-check / check` — `dev` 외 source 브랜치에서 오는 PR 차단 (각 레포에 caller workflow 등록 필요)
+- Required reviewers 없음 — solo self-merge 허용
 
 **`dev`**
 - Force push 금지

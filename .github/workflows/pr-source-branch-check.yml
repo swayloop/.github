@@ -1,0 +1,39 @@
+name: PR Source Branch Check (reusable)
+
+# main 으로의 PR 이 정해진 source 브랜치(기본 `dev`)에서만 오도록 강제.
+# feature 브랜치에서 main 으로 직접 PR 을 막기 위한 가드.
+#
+# 사용 예 (caller workflow):
+#
+#   on:
+#     pull_request:
+#       branches: [main]
+#   jobs:
+#     pr-source-branch-check:
+#       uses: swayloop/.github/.github/workflows/pr-source-branch-check.yml@main
+#
+# 다른 source 브랜치를 허용하려면 `allowed-source` 입력으로 변경 가능.
+
+on:
+  workflow_call:
+    inputs:
+      allowed-source:
+        description: "이 source 브랜치에서 온 PR 만 허용 (기본: dev)"
+        required: false
+        type: string
+        default: "dev"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify PR source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          ALLOWED: ${{ inputs.allowed-source }}
+        run: |
+          if [ "$HEAD_REF" != "$ALLOWED" ]; then
+            echo "::error::PR base 가 보호 브랜치인데 head 는 '$HEAD_REF' 입니다. '$ALLOWED' 브랜치에서만 머지할 수 있습니다."
+            exit 1
+          fi
+          echo "Source branch '$HEAD_REF' 허용됨."
