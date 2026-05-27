@@ -41,14 +41,28 @@
 
 > `agent-task` 만 markdown 인 이유: 에이전트가 터미널에서 `gh issue create` 로 만들 때 form (`.yml`) 은 빈 body 로 시작됨. markdown template 은 에이전트가 파일을 읽고 섹션을 채워 `--body-file` 로 전달할 수 있어서 CLI 친화적.
 
-**에이전트가 이슈 만들 때:**
+### 에이전트가 CLI 로 이슈 만들 때
+
+> ⚠️ `gh issue create` 는 template 의 **frontmatter (labels / title prefix 등) 을 무시**한다. 라벨과 타이틀 prefix 는 CLI 플래그로 직접 지정해야 한다. (frontmatter 가 적용되는 건 웹 UI 뿐.)
+
 ```bash
-# 1. 템플릿 읽고 섹션 채운 임시 파일 작성
-cp .github/ISSUE_TEMPLATE/agent-task.md /tmp/issue-body.md
-# (에이전트가 /tmp/issue-body.md 의 frontmatter 제거 + 각 섹션의 <!-- --> 안내를 실제 내용으로 교체)
-# 2. 이슈 생성
-gh issue create --title "[Agent Task] ..." --body-file /tmp/issue-body.md --label "status: triage"
+# 1. org 표준 템플릿 가져오기 (어느 repo 에서 작업 중이든 동작)
+gh api repos/swayloop/.github/contents/.github/ISSUE_TEMPLATE/agent-task.md \
+  --jq .content | base64 -d \
+  | sed '/^---$/,/^---$/d' \
+  > /tmp/issue-body.md
+
+# 2. /tmp/issue-body.md 의 각 섹션의 <!-- 안내 --> 를 실제 내용으로 교체
+#    (비워둘 섹션은 그대로 두거나 헤더째 삭제)
+
+# 3. 이슈 생성 — 라벨과 타이틀 prefix 를 CLI 에서 직접 지정
+gh issue create \
+  --title "[Agent Task] <한 줄 요약>" \
+  --body-file /tmp/issue-body.md \
+  --label "status: triage"
 ```
+
+`--label "status: triage"` 를 빠뜨리면 트리아지 큐에서 누락됨.
 
 `agent-task.md` 의 필드 (필수: 요약 / 수용 기준, 나머지 선택):
 - 수용 기준 (Acceptance Criteria) — binary 체크리스트
@@ -63,7 +77,7 @@ gh issue create --title "[Agent Task] ..." --body-file /tmp/issue-body.md --labe
 
 ## 트리아지
 
-새 이슈는 자동으로 `status: triage` 가 붙습니다. 다음 순서로 처리:
+새 이슈는 `status: triage` 가 붙은 채로 시작합니다 — 웹 UI 는 template 의 `labels:` frontmatter 로 자동, CLI 는 위 사용법대로 `--label "status: triage"` 명시. 다음 순서로 처리:
 
 1. **분류**: `type:` 라벨 확정 (이미 템플릿에서 붙음)
 2. **우선순위**: `priority:` 부여
