@@ -42,8 +42,18 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # release-please 가 만든 release PR 이 다른 워크플로우(pr-source-branch-check 등)를
+      # 트리거하려면 GITHUB_TOKEN 이 아닌 App 토큰으로 PR 을 만들어야 한다.
+      # GITHUB_TOKEN 으로 생성된 이벤트는 무한루프 방지 정책상 워크플로우를 트리거하지 않음.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
       - uses: googleapis/release-please-action@v4
         with:
+          token: ${{ steps.app-token.outputs.token }}
           release-type: ${{ inputs.release-type }}
           config-file: ${{ inputs.config-file }}
           manifest-file: ${{ inputs.manifest-file }}
