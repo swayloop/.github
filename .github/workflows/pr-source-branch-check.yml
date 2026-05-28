@@ -32,8 +32,17 @@ jobs:
           HEAD_REF: ${{ github.head_ref }}
           ALLOWED: ${{ inputs.allowed-source }}
         run: |
-          if [ "$HEAD_REF" != "$ALLOWED" ]; then
-            echo "::error::PR base 가 보호 브랜치인데 head 는 '$HEAD_REF' 입니다. '$ALLOWED' 브랜치에서만 머지할 수 있습니다."
-            exit 1
+          if [ "$HEAD_REF" = "$ALLOWED" ]; then
+            echo "Source branch '$HEAD_REF' 허용됨."
+            exit 0
           fi
-          echo "Source branch '$HEAD_REF' 허용됨."
+          # release-please 가 자동 생성하는 release PR 은 통과시킴.
+          # 브랜치명 패턴: release-please--branches--<base>[--components--<name>]
+          case "$HEAD_REF" in
+            release-please--*)
+              echo "release-please 브랜치 '$HEAD_REF' 허용됨."
+              exit 0
+              ;;
+          esac
+          echo "::error::PR base 가 보호 브랜치인데 head 는 '$HEAD_REF' 입니다. '$ALLOWED' 또는 release-please 브랜치에서만 머지할 수 있습니다."
+          exit 1
