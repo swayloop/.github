@@ -1,0 +1,89 @@
+name: Node pnpm CI (reusable)
+
+# Reusable workflow for Node/pnpm repositories.
+#
+# Caller workflow example:
+#
+#   name: CI
+#   on:
+#     pull_request:
+#       branches: [main, dev]
+#   jobs:
+#     ci:
+#       uses: swayloop/.github/.github/workflows/node-pnpm-ci.yml@main
+#
+# This workflow runs package scripts only when they exist:
+# format:check, lint, typecheck, build, test.
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Node.js version"
+        required: false
+        type: string
+        default: "20"
+      working-directory:
+        description: "Directory containing package.json"
+        required: false
+        type: string
+        default: "."
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: pnpm
+          cache-dependency-path: ${{ inputs.working-directory }}/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: |
+          if jq -e '.scripts."format:check"' package.json > /dev/null; then
+            pnpm format:check
+          else
+            echo "no format:check script, skipping"
+          fi
+
+      - name: Lint
+        run: |
+          if jq -e '.scripts.lint' package.json > /dev/null; then
+            pnpm lint
+          else
+            echo "no lint script, skipping"
+          fi
+
+      - name: Typecheck
+        run: |
+          if jq -e '.scripts.typecheck' package.json > /dev/null; then
+            pnpm typecheck
+          else
+            echo "no typecheck script, skipping"
+          fi
+
+      - name: Build
+        run: |
+          if jq -e '.scripts.build' package.json > /dev/null; then
+            pnpm build
+          else
+            echo "no build script, skipping"
+          fi
+
+      - name: Test
+        run: |
+          if jq -e '.scripts.test' package.json > /dev/null; then
+            pnpm test
+          else
+            echo "no test script, skipping"
+          fi
