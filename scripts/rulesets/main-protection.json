@@ -27,6 +27,7 @@
       "parameters": {
         "strict_required_status_checks_policy": false,
         "required_status_checks": [
+          { "context": "ci / checks" },
           { "context": "pr-source-branch-check / check" }
         ]
       }

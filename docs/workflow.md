@@ -88,18 +88,19 @@ main 으로 직접 머지하지 말 것. 일상 작업은 항상 `feature → de
 org 공통 reusable workflow 가 [`swayloop/.github/.github/workflows/`](../.github/workflows) 에 있습니다. 각 레포에서 다음과 같이 호출:
 
 ```yaml
-# .github/workflows/release.yml (in your repo)
-name: Release
+# .github/workflows/ci.yml (in your repo)
+name: CI
 on:
-  push:
-    branches: [main]
+  pull_request:
+    branches: [main, dev]
 jobs:
-  release:
-    uses: swayloop/.github/.github/workflows/release-please.yml@main
+  ci:
+    uses: swayloop/.github/.github/workflows/node-pnpm-ci.yml@main
 ```
 
 | Workflow | 용도 | 트리거 |
 |---|---|---|
+| `node-pnpm-ci.yml` | Node/pnpm 레포 공통 CI (`format:check`, lint, typecheck, build, test 조건부 실행) | PR |
 | `release-please.yml` | 릴리즈 PR 자동 생성 | main push |
 | `auto-close-issues.yml` | PR 머지 시 이슈 자동 close | PR closed |
 | `claude-mention.yml` | `@claude` 멘션 응답 | comment/issue |
@@ -134,6 +135,7 @@ org 의 public 레포에는 [`scripts/apply-rulesets.sh`](../scripts/apply-rules
 - Force push 금지
 - 삭제 금지
 - Linear history (squash/rebase only, merge commit 금지)
+- Required status check: `ci / checks` — Node/pnpm 레포는 `node-pnpm-ci.yml` caller job 이름을 `ci` 로 등록
 - Required status check: `pr-source-branch-check / check` — `dev` 외 source 브랜치에서 오는 PR 차단 (각 레포에 caller workflow 등록 필요)
 - Required reviewers 없음 — solo self-merge 허용
 

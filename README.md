@@ -10,7 +10,7 @@ swayloop org의 공통 표준을 담는 메타 레포입니다.
 - `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` — 모든 레포에 상속
 - `.github/ISSUE_TEMPLATE/` — 이슈 템플릿 (모든 레포 기본값)
 - `.github/PULL_REQUEST_TEMPLATE.md` — PR 템플릿 (모든 레포 기본값)
-- `.github/workflows/` — reusable workflow (다른 레포에서 `uses:` 로 호출: release-please, auto-close-issues, claude-mention, sync-labels)
+- `.github/workflows/` — reusable workflow (다른 레포에서 `uses:` 로 호출: node-pnpm-ci, release-please, auto-close-issues, claude-mention, sync-labels)
 - `.github/labels.yml` — 라벨 표준
 - `docs/` — 설계 및 운영 문서 (워크플로우, 이슈 관리, 프로젝트 표준)
 

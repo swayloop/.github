@@ -12,7 +12,7 @@
 - [ ] 기본 브랜치는 `main`
 - [ ] 브랜치 보호 (TODO: 규칙 확정)
 - [ ] 이슈/PR 템플릿은 org `.github` 에서 상속됨 — 별도 설정 불필요
-- [ ] CI 추가 (reusable workflow 권장)
+- [ ] CI 추가: Node/pnpm 레포는 `swayloop/.github/.github/workflows/node-pnpm-ci.yml@main` 호출
 
 ## README 구조
 
@@ -38,7 +38,7 @@
 
 > TODO: 언어별로 표준 도구 정리.
 
-- JavaScript/TypeScript: ESLint + Prettier
+- JavaScript/TypeScript: ESLint + Prettier, CI 에서 `format:check` / `lint` / `typecheck` / `build` / `test` 조건부 실행
 - Python: Ruff + Black or just Ruff(format)
 - Go: gofmt + golangci-lint
 
