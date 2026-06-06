@@ -47,6 +47,10 @@ Claude 와 Codex 는 각자 디렉토리(`.claude/skills`·`.codex/skills`)를 �
 중복을 피하려고 **내용은 1벌만 두고 다른 쪽은 상대 심링크**로 가리킨다 — 전역은 메타 repo 로의 심링크,
 프로젝트(`--target`)는 `.claude` 정본 1벌 + `.codex` 상대 심링크(git 에 커밋되어 클론 시 동작).
 
+스킬은 외부 표준 콘텐츠이므로, 프로젝트 설치 시 스킬 디렉토리(`.claude/skills/`, `.codex/skills/`)를
+프로젝트의 `.prettierignore`·`.eslintignore`(존재할 때만)에 자동 등록해, 포매터/린터 CI 가
+vendored 스킬을 검사하지 않게 한다.
+
 호출: Claude Code `/<name>`, Codex `$<name>` 또는 `/skills` (description 매칭 시 자동).
 
 ## 새 스킬 만들기
