@@ -121,6 +121,22 @@ for name in "${skills[@]}"; do
   fi
 done
 
+# vendored 스킬은 외부 표준 콘텐츠이므로 프로젝트 포매터/린터가 건드리지 않게 ignore 등록
+ignore_entry() {  # file, entry
+  local file="$1" entry="$2"
+  if [ ! -f "$file" ] || ! grep -qxF "$entry" "$file"; then
+    printf '%s\n' "$entry" >> "$file"
+    printf '  + %s: %s\n' "$(basename "$file")" "$entry"
+  fi
+}
+if [ -n "$target" ]; then
+  for ig in "$target/.prettierignore" "$target/.eslintignore"; do
+    [ -e "$ig" ] || continue  # 해당 도구를 안 쓰면 파일 자체가 없음 → 건드리지 않음
+    [ "$do_claude" -eq 1 ] && ignore_entry "$ig" ".claude/skills/"
+    [ "$do_codex" -eq 1 ]  && ignore_entry "$ig" ".codex/skills/"
+  done
+fi
+
 if [ -n "$target" ]; then
   printf '\n완료. 정본 1벌 + 상대 심링크. git 에 커밋해 팀과 공유.\n'
 else
