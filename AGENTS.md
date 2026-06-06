@@ -14,6 +14,7 @@ swayloop org 공통 표준 메타 repo. ISSUE_TEMPLATE / labels / reusable workf
 | **에이전트가 CLI 로 이슈 생성** | [docs/issue-management.md#에이전트가-cli-로-이슈-만들-때](docs/issue-management.md#에이전트가-cli-로-이슈-만들-때) — template frontmatter 무시되니 `--label "status: triage"` 명시 필수 |
 | 릴리즈 자동화 | [docs/changelog-automation.md](docs/changelog-automation.md) |
 | 새 레포 표준 | [docs/project-standards.md](docs/project-standards.md) |
+| 에이전트 스킬 (Claude/Codex 공용) | [docs/skills.md](docs/skills.md) — `skills/` 정본, `scripts/install-skills.sh` 로 양쪽 설치, `create-skill` 로 신규 작성 |
 | ISSUE_TEMPLATE / labels | [.github/](.github/) |
 | Reusable GitHub Actions | [.github/workflows/](.github/workflows/) (release-please, claude-mention, auto-close-issues, sync-labels) |
 | 브랜치 보호 스크립트 | [scripts/apply-rulesets.sh](scripts/apply-rulesets.sh) |
