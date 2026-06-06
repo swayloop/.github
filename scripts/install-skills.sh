@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # install-skills.sh — swayloop/.github 의 skills/ 를 Claude Code + Codex 양쪽에 설치한다.
 #
-#   전역 설치:     install-skills.sh
-#                  → ~/.claude/skills, ~/.codex/skills
-#   프로젝트 설치:  install-skills.sh --target /path/to/project
-#                  → <project>/.claude/skills, <project>/.codex/skills
+#   전역:      install-skills.sh
+#              ~/.claude/skills, ~/.codex/skills 에 메타 repo 로의 심링크 (단일 정본)
+#   프로젝트:  install-skills.sh --target /path/to/project
+#              <project>/.claude/skills/<name> 에 실제 복사(정본 1벌) +
+#              <project>/.codex/skills/<name> 에 상대 심링크
+#              → git 에 커밋 가능, 내용은 1벌만 (중복 없음)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -17,12 +19,13 @@ usage() {
   cat <<'EOF'
 install-skills.sh [options]
 
-기본(전역): ~/.claude/skills 와 ~/.codex/skills 에 설치.
+기본(전역): ~/.claude/skills, ~/.codex/skills 에 메타 repo 로의 심링크.
+--target:   프로젝트에 정본 1벌 복사 + 다른 에이전트는 상대 심링크 (커밋 가능, 중복 없음).
 
 Options:
-  --target <dir>   프로젝트 경로. <dir>/.claude/skills, <dir>/.codex/skills 에 설치.
+  --target <dir>   프로젝트 경로에 설치.
   --only a,b       특정 스킬만 (쉼표 구분). 기본: skills/ 전체.
-  --copy           심링크 대신 복사 (프로젝트에 커밋하려면 권장).
+  --copy           dedup 없이 모든 대상에 실제 복사 (상대 심링크 대신).
   --force          기존 스킬 항목 덮어쓰기.
   --claude-only    Claude 쪽만 설치.
   --codex-only     Codex 쪽만 설치.
@@ -53,20 +56,19 @@ done
 
 [ -d "$SKILLS_DIR" ] || err "skills/ 디렉토리 없음: $SKILLS_DIR"
 
-# 설치 대상 base 경로 결정
-declare -a bases=()
+# 활성 에이전트 base 경로 (claude 우선 = 프로젝트 모드의 정본 위치)
+prefix="$HOME"
 if [ -n "$target" ]; then
   [ -d "$target" ] || err "--target 디렉토리 없음: $target"
   target="$(cd "$target" && pwd)"
-  [ "$do_claude" -eq 1 ] && bases+=("$target/.claude/skills")
-  [ "$do_codex" -eq 1 ]  && bases+=("$target/.codex/skills")
-else
-  [ "$do_claude" -eq 1 ] && bases+=("$HOME/.claude/skills")
-  [ "$do_codex" -eq 1 ]  && bases+=("$HOME/.codex/skills")
+  prefix="$target"
 fi
+declare -a bases=()
+[ "$do_claude" -eq 1 ] && bases+=("$prefix/.claude/skills")
+[ "$do_codex" -eq 1 ]  && bases+=("$prefix/.codex/skills")
 [ "${#bases[@]}" -gt 0 ] || err "설치 대상이 없습니다 (--claude-only/--codex-only 동시 지정?)"
 
-# 설치할 스킬 목록 결정
+# 설치할 스킬 목록
 declare -a skills=()
 if [ -n "$only" ]; then
   IFS=',' read -ra want <<< "$only"
@@ -82,26 +84,45 @@ else
 fi
 [ "${#skills[@]}" -gt 0 ] || err "설치할 스킬이 없습니다."
 
-mode="심링크"; [ "$copy" -eq 1 ] && mode="복사"
-printf '설치 (%s) — 대상: %s\n\n' "$mode" "${target:-전역(~)}"
+# 기존 대상 처리. 0=진행, 1=건너뜀
+prep_dst() {
+  local dst="$1"
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    if [ "$force" -eq 1 ]; then rm -rf "$dst"; else
+      printf '  건너뜀(존재, --force): %s\n' "$dst"; return 1
+    fi
+  fi
+  mkdir -p "$(dirname "$dst")"
+  return 0
+}
+do_copy()    { prep_dst "$2" || return 0; cp -R "$1" "$2"; printf '  ✓ %s (복사)\n' "$2"; }
+do_symlink() { prep_dst "$2" || return 0; ln -s "$1" "$2"; printf '  ✓ %s -> %s (심링크)\n' "$2" "$1"; }
 
-for base in "${bases[@]}"; do
-  mkdir -p "$base"
-  for name in "${skills[@]}"; do
-    src="$SKILLS_DIR/$name"
-    dst="$base/$name"
-    if [ -e "$dst" ] || [ -L "$dst" ]; then
-      if [ "$force" -eq 1 ]; then rm -rf "$dst"; else
-        printf '  건너뜀(존재, --force): %s\n' "$dst"; continue
-      fi
-    fi
-    if [ "$copy" -eq 1 ]; then
-      cp -R "$src" "$dst"
-    else
-      ln -s "$src" "$dst"
-    fi
-    printf '  ✓ %s\n' "$dst"
-  done
+printf '설치 — 대상: %s\n\n' "${target:-전역(~)}"
+
+for name in "${skills[@]}"; do
+  src="$SKILLS_DIR/$name"
+  if [ -z "$target" ]; then
+    # 전역: 메타 repo 로의 절대 심링크(단일 정본), 또는 --copy
+    for base in "${bases[@]}"; do
+      if [ "$copy" -eq 1 ]; then do_copy "$src" "$base/$name"; else do_symlink "$src" "$base/$name"; fi
+    done
+  else
+    # 프로젝트: 첫 base = 정본 실제 복사, 나머지 = 정본으로의 상대 심링크
+    canonical="${bases[0]}"
+    do_copy "$src" "$canonical/$name"
+    canon_rel="../../$(basename "$(dirname "$canonical")")/$(basename "$canonical")/$name"  # 예: ../../.claude/skills/<name>
+    i=1
+    while [ "$i" -lt "${#bases[@]}" ]; do
+      other="${bases[$i]}"
+      if [ "$copy" -eq 1 ]; then do_copy "$src" "$other/$name"; else do_symlink "$canon_rel" "$other/$name"; fi
+      i=$((i+1))
+    done
+  fi
 done
 
-printf '\n완료. 업데이트는 이 repo 에서 git pull%s.\n' "$([ "$copy" -eq 1 ] && echo ' 후 재실행' || echo ' (심링크라 자동 반영)')"
+if [ -n "$target" ]; then
+  printf '\n완료. 정본 1벌 + 상대 심링크. git 에 커밋해 팀과 공유.\n'
+else
+  printf '\n완료. 업데이트는 이 repo 에서 git pull%s.\n' "$([ "$copy" -eq 1 ] && echo ' 후 재실행' || echo ' (심링크라 자동 반영)')"
+fi
