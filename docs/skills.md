@@ -35,13 +35,17 @@ bash scripts/install-skills.sh --target /path/to/project
 
 | 옵션 | 동작 |
 |---|---|
-| (기본) | `~/.claude/skills`, `~/.codex/skills` 에 전역 설치 |
-| `--target <dir>` | `<dir>/.claude/skills`, `<dir>/.codex/skills` 에 프로젝트 설치 |
+| (기본, 전역) | `~/.claude/skills`, `~/.codex/skills` 에 **메타 repo 로의 심링크** (단일 정본) |
+| `--target <dir>` | 프로젝트에 설치 — `.claude/skills/<name>` 에 **실제 1벌** + `.codex/skills/<name>` 은 **상대 심링크** |
 | `--only a,b` | 특정 스킬만 |
 | `--list` | 설치 가능한 스킬 목록 |
-| `--copy` | 심링크 대신 복사 (프로젝트에 커밋하려면) |
+| `--copy` | dedup 없이 모든 대상에 실제 복사 (상대 심링크 대신) |
 | `--force` | 기존 항목 덮어쓰기 |
 | `--claude-only` / `--codex-only` | 한쪽만 |
+
+Claude 와 Codex 는 각자 디렉토리(`.claude/skills`·`.codex/skills`)를 스캔하므로 양쪽에 항목이 있어야 한다.
+중복을 피하려고 **내용은 1벌만 두고 다른 쪽은 상대 심링크**로 가리킨다 — 전역은 메타 repo 로의 심링크,
+프로젝트(`--target`)는 `.claude` 정본 1벌 + `.codex` 상대 심링크(git 에 커밋되어 클론 시 동작).
 
 호출: Claude Code `/<name>`, Codex `$<name>` 또는 `/skills` (description 매칭 시 자동).
 
