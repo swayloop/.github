@@ -30,11 +30,15 @@ Claude Code 와 Codex 는 **같은 오픈 표준 `SKILL.md`** 를 쓴다. 한 �
 - Claude Code: `/<name>` 또는 description 매칭 시 자동
 - Codex: `$<name>` 또는 `/skills`, 또는 description 매칭 시 자동
 
-## 설치 위치
+## 설치 위치 (canonical: `.agents/skills`)
 
-| | Claude Code | Codex |
+정본은 에이전트 중립 `.agents/skills` 에 둔다. Codex·Cursor·Gemini·Copilot 등은 이걸 native scan 한다.
+Claude Code 는 `.agents` 를 안 읽으므로 `.claude/skills` 를 그쪽으로 심링크한다.
+
+| | 정본 (Codex 등 native scan) | Claude Code |
 |---|---|---|
-| 개인(전역) | `~/.claude/skills/<name>/` | `~/.codex/skills/<name>/` |
-| 프로젝트 | `.claude/skills/<name>/` | `.codex/skills/<name>/` |
+| 개인(전역) | `~/.agents/skills/<name>/` | `~/.claude/skills/<name>/` → 정본 심링크 |
+| 프로젝트 | `<repo>/.agents/skills/<name>/` | `<repo>/.claude/skills` → `../.agents/skills` (디렉토리 심링크) |
 
-`create-skill.sh install` 은 정본 폴더를 두 개인 디렉토리에 **심링크**해 단일 정본을 유지한다.
+`.codex/skills` 는 만들지 않는다 (Codex 가 `.agents/skills` 를 native scan).
+`create-skill.sh install` 과 `scripts/install-skills.sh` 가 이 구조로 설치한다.

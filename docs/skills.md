@@ -18,8 +18,8 @@ frontmatter 공통/에이전트전용 구분, 호출 방법, 설치 위치는
 
 ## 설치
 
-`scripts/install-skills.sh` 가 `skills/` 를 Claude Code(`~/.claude/skills`)와
-Codex(`~/.codex/skills`) 양쪽에 설치한다. 기본은 **심링크**라 이 repo 를 `git pull` 하면 자동 반영.
+정본은 **에이전트 중립 `.agents/skills`** 에 둔다. Codex·Cursor·Gemini·Copilot 등은 이걸 native scan 한다.
+Claude Code 는 `.agents` 를 안 읽으므로 `.claude/skills` 를 그쪽으로 심링크한다. `.codex/skills` 는 만들지 않는다.
 
 ```bash
 # 1) 이 repo 클론 (정본)
@@ -35,21 +35,20 @@ bash scripts/install-skills.sh --target /path/to/project
 
 | 옵션 | 동작 |
 |---|---|
-| (기본, 전역) | `~/.claude/skills`, `~/.codex/skills` 에 **메타 repo 로의 심링크** (단일 정본) |
-| `--target <dir>` | 프로젝트에 설치 — `.claude/skills/<name>` 에 **실제 1벌** + `.codex/skills/<name>` 은 **상대 심링크** |
+| (기본, 전역) | `~/.agents/skills/<name>`(Codex 등) + `~/.claude/skills/<name>`(Claude) 에 메타 repo 로의 심링크 |
+| `--target <dir>` | 프로젝트에 설치 — `.agents/skills/<name>` 에 **정본 1벌** + `.claude/skills` → `../.agents/skills` (디렉토리 심링크) |
 | `--only a,b` | 특정 스킬만 |
 | `--list` | 설치 가능한 스킬 목록 |
-| `--copy` | dedup 없이 모든 대상에 실제 복사 (상대 심링크 대신) |
+| `--copy` | (전역) 심링크 대신 복사 |
 | `--force` | 기존 항목 덮어쓰기 |
-| `--claude-only` / `--codex-only` | 한쪽만 |
+| `--claude-only` / `--codex-only` | Claude(`.claude`) / Codex(`.agents`) 매핑만 |
 
-Claude 와 Codex 는 각자 디렉토리(`.claude/skills`·`.codex/skills`)를 스캔하므로 양쪽에 항목이 있어야 한다.
-중복을 피하려고 **내용은 1벌만 두고 다른 쪽은 상대 심링크**로 가리킨다 — 전역은 메타 repo 로의 심링크,
-프로젝트(`--target`)는 `.claude` 정본 1벌 + `.codex` 상대 심링크(git 에 커밋되어 클론 시 동작).
+**왜 이렇게:** Codex 는 `.agents/skills` 를 native scan, Claude 는 `.claude/skills` 만 읽는다.
+그래서 정본을 `.agents/skills` 한 곳에 두고 Claude 용으로만 `.claude/skills` 심링크를 건다 — 내용은 1벌,
+`.codex/skills` 불필요. 프로젝트 설치는 git 에 커밋되어 클론 시에도 동작한다.
 
-스킬은 외부 표준 콘텐츠이므로, 프로젝트 설치 시 스킬 디렉토리(`.claude/skills/`, `.codex/skills/`)를
-프로젝트의 `.prettierignore`·`.eslintignore`(존재할 때만)에 자동 등록해, 포매터/린터 CI 가
-vendored 스킬을 검사하지 않게 한다.
+스킬은 외부 표준 콘텐츠이므로, 프로젝트 설치 시 `.agents/skills/`·`.claude/skills/` 를 프로젝트의
+`.prettierignore`·`.eslintignore`(존재할 때만)에 자동 등록해, 포매터/린터 CI 가 vendored 스킬을 검사하지 않게 한다.
 
 호출: Claude Code `/<name>`, Codex `$<name>` 또는 `/skills` (description 매칭 시 자동).
 
