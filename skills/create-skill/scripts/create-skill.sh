@@ -188,8 +188,10 @@ cmd_install() {
   local name; name=$(basename "$abs")
   [ -f "$abs/SKILL.md" ] || err "SKILL.md 없음 — 스킬 폴더가 맞나요?"
 
+  # 정본은 에이전트 중립 ~/.agents/skills (Codex 등 native scan),
+  # Claude 는 .agents 를 안 읽으므로 ~/.claude/skills 에도 심링크.
   local t link
-  for t in "$HOME/.claude/skills" "$HOME/.codex/skills"; do
+  for t in "$HOME/.agents/skills" "$HOME/.claude/skills"; do
     mkdir -p "$t"
     link="$t/$name"
     if [ -e "$link" ] || [ -L "$link" ]; then
@@ -200,7 +202,7 @@ cmd_install() {
     ln -s "$abs" "$link"
     printf '설치: %s -> %s\n' "$link" "$abs"
   done
-  printf '\n호출: Claude=/%s,  Codex=$%s\n' "$name" "$name"
+  printf '\n호출: Claude=/%s,  Codex=$%s (Codex 는 ~/.agents/skills 를 native scan)\n' "$name" "$name"
 }
 
 # ───────────────────────── dispatch ─────────────────────────

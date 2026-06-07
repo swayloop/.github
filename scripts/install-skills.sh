@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# install-skills.sh — swayloop/.github 의 skills/ 를 Claude Code + Codex 양쪽에 설치한다.
+# install-skills.sh — swayloop/.github 의 skills/ 를 에이전트들이 쓸 수 있게 설치한다.
+#
+# 정본은 에이전트 중립 .agents/skills (Codex·Cursor·Gemini·Copilot 등이 native scan).
+# Claude Code 는 .agents 를 읽지 않으므로 .claude/skills 를 그쪽으로 심링크한다.
+# Codex 는 .agents/skills 를 native scan 하므로 .codex/skills 는 만들지 않는다.
 #
 #   전역:      install-skills.sh
-#              ~/.claude/skills, ~/.codex/skills 에 메타 repo 로의 심링크 (단일 정본)
+#              ~/.agents/skills/<name> (Codex 등) + ~/.claude/skills/<name> (Claude)
+#              둘 다 메타 repo 로의 심링크 (단일 정본)
 #   프로젝트:  install-skills.sh --target /path/to/project
-#              <project>/.claude/skills/<name> 에 실제 복사(정본 1벌) +
-#              <project>/.codex/skills/<name> 에 상대 심링크
-#              → git 에 커밋 가능, 내용은 1벌만 (중복 없음)
+#              <p>/.agents/skills/<name>/ 실제 1벌 (정본) +
+#              <p>/.claude/skills -> ../.agents/skills (디렉토리 심링크)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,16 +23,18 @@ usage() {
   cat <<'EOF'
 install-skills.sh [options]
 
-기본(전역): ~/.claude/skills, ~/.codex/skills 에 메타 repo 로의 심링크.
---target:   프로젝트에 정본 1벌 복사 + 다른 에이전트는 상대 심링크 (커밋 가능, 중복 없음).
+정본: .agents/skills (에이전트 중립). Claude=.claude/skills 심링크, Codex=.agents native scan.
+
+  전역(기본):  ~/.agents/skills, ~/.claude/skills 에 메타 repo 로의 심링크.
+  --target D:  D/.agents/skills 에 정본 복사 + D/.claude/skills 심링크.
 
 Options:
-  --target <dir>   프로젝트 경로에 설치.
+  --target <dir>   프로젝트에 설치.
   --only a,b       특정 스킬만 (쉼표 구분). 기본: skills/ 전체.
-  --copy           dedup 없이 모든 대상에 실제 복사 (상대 심링크 대신).
-  --force          기존 스킬 항목 덮어쓰기.
-  --claude-only    Claude 쪽만 설치.
-  --codex-only     Codex 쪽만 설치.
+  --copy           (전역) 심링크 대신 복사.
+  --force          기존 항목 덮어쓰기.
+  --claude-only    Claude 매핑만 (.claude/skills).
+  --codex-only     Codex 매핑만 (.agents/skills).
   --list           설치 가능한 스킬 목록만 출력.
   -h, --help
 EOF
@@ -55,18 +61,12 @@ while [ $# -gt 0 ]; do
 done
 
 [ -d "$SKILLS_DIR" ] || err "skills/ 디렉토리 없음: $SKILLS_DIR"
+[ "$do_claude" -eq 1 ] || [ "$do_codex" -eq 1 ] || err "설치 대상이 없습니다 (--claude-only/--codex-only 동시 지정?)"
 
-# 활성 에이전트 base 경로 (claude 우선 = 프로젝트 모드의 정본 위치)
-prefix="$HOME"
 if [ -n "$target" ]; then
   [ -d "$target" ] || err "--target 디렉토리 없음: $target"
   target="$(cd "$target" && pwd)"
-  prefix="$target"
 fi
-declare -a bases=()
-[ "$do_claude" -eq 1 ] && bases+=("$prefix/.claude/skills")
-[ "$do_codex" -eq 1 ]  && bases+=("$prefix/.codex/skills")
-[ "${#bases[@]}" -gt 0 ] || err "설치 대상이 없습니다 (--claude-only/--codex-only 동시 지정?)"
 
 # 설치할 스킬 목록
 declare -a skills=()
@@ -100,45 +100,43 @@ do_symlink() { prep_dst "$2" || return 0; ln -s "$1" "$2"; printf '  ✓ %s -> %
 
 printf '설치 — 대상: %s\n\n' "${target:-전역(~)}"
 
-for name in "${skills[@]}"; do
-  src="$SKILLS_DIR/$name"
-  if [ -z "$target" ]; then
-    # 전역: 메타 repo 로의 절대 심링크(단일 정본), 또는 --copy
-    for base in "${bases[@]}"; do
-      if [ "$copy" -eq 1 ]; then do_copy "$src" "$base/$name"; else do_symlink "$src" "$base/$name"; fi
-    done
-  else
-    # 프로젝트: 첫 base = 정본 실제 복사, 나머지 = 정본으로의 상대 심링크
-    canonical="${bases[0]}"
-    do_copy "$src" "$canonical/$name"
-    canon_rel="../../$(basename "$(dirname "$canonical")")/$(basename "$canonical")/$name"  # 예: ../../.claude/skills/<name>
-    i=1
-    while [ "$i" -lt "${#bases[@]}" ]; do
-      other="${bases[$i]}"
-      if [ "$copy" -eq 1 ]; then do_copy "$src" "$other/$name"; else do_symlink "$canon_rel" "$other/$name"; fi
-      i=$((i+1))
-    done
+if [ -z "$target" ]; then
+  # 전역: ~/.agents(Codex 등), ~/.claude(Claude). 둘 다 메타 repo 로의 심링크(또는 --copy).
+  for name in "${skills[@]}"; do
+    src="$SKILLS_DIR/$name"
+    if [ "$do_codex" -eq 1 ]; then
+      if [ "$copy" -eq 1 ]; then do_copy "$src" "$HOME/.agents/skills/$name"; else do_symlink "$src" "$HOME/.agents/skills/$name"; fi
+    fi
+    if [ "$do_claude" -eq 1 ]; then
+      if [ "$copy" -eq 1 ]; then do_copy "$src" "$HOME/.claude/skills/$name"; else do_symlink "$src" "$HOME/.claude/skills/$name"; fi
+    fi
+  done
+else
+  # 프로젝트(Phase D): .agents/skills 가 정본(실제 복사), .claude/skills 는 디렉토리 심링크.
+  for name in "${skills[@]}"; do
+    do_copy "$SKILLS_DIR/$name" "$target/.agents/skills/$name"
+  done
+  if [ "$do_claude" -eq 1 ]; then
+    do_symlink "../.agents/skills" "$target/.claude/skills"   # Claude 가 .agents 를 못 읽어 심링크
   fi
-done
+  # Codex 는 .agents/skills 를 native scan → 별도 매핑 불필요
 
-# vendored 스킬은 외부 표준 콘텐츠이므로 프로젝트 포매터/린터가 건드리지 않게 ignore 등록
-ignore_entry() {  # file, entry
-  local file="$1" entry="$2"
-  if [ ! -f "$file" ] || ! grep -qxF "$entry" "$file"; then
-    printf '%s\n' "$entry" >> "$file"
-    printf '  + %s: %s\n' "$(basename "$file")" "$entry"
-  fi
-}
-if [ -n "$target" ]; then
+  # vendored 스킬을 프로젝트 포매터/린터가 건드리지 않게 ignore 등록 (있을 때만)
+  ignore_entry() {
+    local file="$1" entry="$2"
+    if [ ! -f "$file" ] || ! grep -qxF "$entry" "$file"; then
+      printf '%s\n' "$entry" >> "$file"; printf '  + %s: %s\n' "$(basename "$file")" "$entry"
+    fi
+  }
   for ig in "$target/.prettierignore" "$target/.eslintignore"; do
-    [ -e "$ig" ] || continue  # 해당 도구를 안 쓰면 파일 자체가 없음 → 건드리지 않음
+    [ -e "$ig" ] || continue
+    ignore_entry "$ig" ".agents/skills/"
     [ "$do_claude" -eq 1 ] && ignore_entry "$ig" ".claude/skills/"
-    [ "$do_codex" -eq 1 ]  && ignore_entry "$ig" ".codex/skills/"
   done
 fi
 
 if [ -n "$target" ]; then
-  printf '\n완료. 정본 1벌 + 상대 심링크. git 에 커밋해 팀과 공유.\n'
+  printf '\n완료. 정본 .agents/skills + Claude 심링크. Codex 는 .agents 를 native scan. git 에 커밋해 공유.\n'
 else
-  printf '\n완료. 업데이트는 이 repo 에서 git pull%s.\n' "$([ "$copy" -eq 1 ] && echo ' 후 재실행' || echo ' (심링크라 자동 반영)')"
+  printf '\n완료 (~/.agents = Codex 등, ~/.claude = Claude). 업데이트는 이 repo 에서 git pull%s.\n' "$([ "$copy" -eq 1 ] && echo ' 후 재실행' || echo ' (심링크라 자동 반영)')"
 fi
