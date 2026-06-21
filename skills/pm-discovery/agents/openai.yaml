@@ -1,0 +1,7 @@
+interface:
+   display_name: 'pm-discovery'
+   short_description: '프로젝트 컨텍스트를 읽고 그날의 가설·검증할 최소 기능을 정해 create-issue 로 이슈를 만드는 pm-discovery 루틴을 시작할 때'
+   default_prompt: '$pm-discovery 를 시작해줘.'
+
+policy:
+   allow_implicit_invocation: true
