@@ -1,8 +1,8 @@
 ---
-name: "🤖 Agent Task"
-about: 에이전트 친화적 작업 이슈 (분해된 sub-task 또는 명확한 단일 작업)
-title: "[Agent Task] "
-labels: ["status: triage"]
+name: '🤖 Agent Task'
+about: 에이전트에게 할당할 Task (분해된 sub-task 또는 명확한 단일 작업)
+title: '[Agent Task] '
+labels: ['status: triage']
 ---
 
 <!--
@@ -14,7 +14,7 @@ Harness Engineering 4축으로 구성된 양식입니다:
 
 # 맥락 (Context)
 
-## 요약 *(필수)*
+## 요약 _(필수)_
 
 <!-- 무엇을, 왜. 한두 문장 -->
 
@@ -62,25 +62,11 @@ Harness Engineering 4축으로 구성된 양식입니다:
 체크리스트로 풀어도 OK.
 -->
 
-## 병렬화 가능?
-
-<!-- yes / no / partial. partial 이면 어떤 부분이 직렬인지 한 줄. `parallel-ok` 라벨과 매핑 -->
-
-## Agent Routing
-
-<!-- any / claude / codex 중 하나 (자동 워크플로우가 `agent:` 라벨로 매핑) -->
-
-any
-
-## Budget Hint
-
-<!-- 모델 / 최대 iteration. runaway 방지. 예: sonnet, max_iterations=10 -->
-
 ---
 
 # 검증 (Verification)
 
-## 수용 기준 (Acceptance Criteria) *(필수)*
+## 수용 기준 (Acceptance Criteria) _(필수)_
 
 <!-- 에이전트가 "끝났다" 판단할 binary 체크리스트 -->
 
@@ -90,16 +76,6 @@ any
 ## Test Plan
 
 <!-- 어떻게 검증할지. 예: 기존 테스트 통과, 새 케이스 ... -->
-
-## 검증 주체
-
-<!--
-누가 / 무엇이 AC 만족을 확인하는지. 복수 선택 가능.
-- agent self-check (테스트 실행, lint 등)
-- CI workflow (예: e2e, type-check)
-- 사람 review (시각/UX, 보안 판단 등)
-기본: CI + 사람 review
--->
 
 ---
 

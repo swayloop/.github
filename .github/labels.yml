@@ -1,84 +1,58 @@
 # swayloop 공통 라벨 표준
 # 동기화 방법은 docs/issue-management.md 참고
-#
-# 카테고리:
-#   type:*      이슈/PR 의 종류 (bug, feature, chore, docs, refactor)
-#   priority:*  우선순위 (p0 ~ p3)
-#   status:*    상태 (triage, in-progress, blocked, needs-review)
-#   area:*      영역 (개별 레포에서 확장)
-#   good first issue, help wanted  community
 
 # --- type ---
-- name: "type: bug"
-  color: "d73a4a"
-  description: "동작 오류"
-- name: "type: feature"
-  color: "0e8a16"
-  description: "새 기능 / 개선"
-- name: "type: chore"
-  color: "cfd3d7"
-  description: "잡일 (빌드, 설정, 잡스러운 정리)"
-- name: "type: docs"
-  color: "0075ca"
-  description: "문서"
-- name: "type: refactor"
-  color: "fbca04"
-  description: "동작 변경 없는 리팩터"
+- name: 'type: bug'
+  color: 'd73a4a'
+  description: '동작 오류'
+- name: 'type: feature'
+  color: '0e8a16'
+  description: '새 기능 / 개선'
+- name: 'type: chore'
+  color: 'cfd3d7'
+  description: '잡일 (빌드, 설정, 잡스러운 정리)'
+- name: 'type: docs'
+  color: '0075ca'
+  description: '문서'
+- name: 'type: refactor'
+  color: 'fbca04'
+  description: '동작 변경 없는 리팩터'
 
 # --- priority ---
-- name: "priority: p0"
-  color: "b60205"
-  description: "즉시 (장애/차단)"
-- name: "priority: p1"
-  color: "d93f0b"
-  description: "이번 주"
-- name: "priority: p2"
-  color: "fbca04"
-  description: "이번 사이클"
-- name: "priority: p3"
-  color: "c5def5"
-  description: "backlog"
+- name: 'priority: p0'
+  color: 'b60205'
+  description: '즉시 (장애/차단)'
+- name: 'priority: p1'
+  color: 'd93f0b'
+  description: '이번 주'
+- name: 'priority: p2'
+  color: 'fbca04'
+  description: '이번 사이클'
+- name: 'priority: p3'
+  color: 'c5def5'
+  description: 'backlog'
 
 # --- status ---
-- name: "status: triage"
-  color: "ededed"
-  description: "분류 필요"
-- name: "status: in-progress"
-  color: "1d76db"
-  description: "작업 중"
-- name: "status: blocked"
-  color: "5319e7"
-  description: "외부 요인으로 막힘"
-- name: "status: needs-review"
-  color: "0e8a16"
-  description: "리뷰 대기"
-
-# --- agent routing ---
-- name: "agent: claude"
-  color: "8957e5"
-  description: "Claude Code 가 처리할 작업"
-- name: "agent: codex"
-  color: "2da44e"
-  description: "Codex 가 처리할 작업"
-- name: "agent: any"
-  color: "c5def5"
-  description: "아무 에이전트 가능"
+- name: 'status: triage'
+  color: 'ededed'
+  description: '분류 필요'
+- name: 'status: in-progress'
+  color: '1d76db'
+  description: '작업 중'
+- name: 'status: blocked'
+  color: '5319e7'
+  description: '외부 요인으로 막힘'
+- name: 'status: needs-review'
+  color: '0e8a16'
+  description: '리뷰 대기'
 
 # --- task decomposition ---
-- name: "parent-task"
-  color: "5319e7"
-  description: "분해 필요 (sub-task 들로 쪼개짐)"
-- name: "sub-task"
-  color: "bfd4f2"
-  description: "parent 에서 분해된 sub-task"
-- name: "parallel-ok"
-  color: "0e8a16"
-  description: "여러 워커 병렬 처리 가능"
-
-# --- community ---
-- name: "good first issue"
-  color: "7057ff"
-  description: "처음 기여하기 좋은 이슈"
-- name: "help wanted"
-  color: "008672"
-  description: "도움이 필요해요"
+- name: 'parent-task'
+  color: '5319e7'
+  description: '분해 필요 (sub-task 들로 쪼개짐)'
+- name: 'sub-task'
+  color: 'bfd4f2'
+  description: 'parent 에서 분해된 sub-task'
+- name: 'parallel-ok'
+  color: '0e8a16'
+  description: '여러 워커 병렬 처리 가능'

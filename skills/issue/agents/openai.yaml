@@ -1,0 +1,6 @@
+interface:
+   display_name: 'Issue N'
+   short_description: 'git 이슈 번호를 기준으로 SwayLoop의 공통 이슈 작업 플로우를 시작할 때 사용한다.'
+
+policy:
+   allow_implicit_invocation: true
