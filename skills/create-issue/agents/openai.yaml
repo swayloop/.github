@@ -1,0 +1,7 @@
+interface:
+  display_name: "create-issue"
+  short_description: "swayloop org 레포에서 새 작업 이슈(agent-task)를 CLI로 만들 때 사용한다. org 표준 템플릿을 가져와"
+  default_prompt: "$create-issue 를 시작해줘."
+
+policy:
+  allow_implicit_invocation: true
