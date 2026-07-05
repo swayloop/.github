@@ -34,6 +34,12 @@ on:
         required: false
         type: string
         default: ".release-please-manifest.json"
+    secrets:
+      # App 토큰용 개인 키. 미설정 레포는 GITHUB_TOKEN 으로 fallback 하므로 optional.
+      # (선언하지 않으면 caller 가 secrets: inherit 를 넘겨야 하고, 참조 시 검증 실패 위험)
+      RELEASE_BOT_PRIVATE_KEY:
+        description: "GitHub App private key for release-please PRs (optional)"
+        required: false
 
 jobs:
   release-please:
@@ -46,10 +52,12 @@ jobs:
       # 트리거하려면 GITHUB_TOKEN 이 아닌 App 토큰으로 PR 을 만들어야 한다.
       # GITHUB_TOKEN 으로 생성된 이벤트는 무한루프 방지 정책상 워크플로우를 트리거하지 않음.
       #
-      # secret 미설정 레포는 이 step 을 건너뛰고 GITHUB_TOKEN 으로 fallback (기존 동작 유지).
+      # App 미설정 레포는 이 step 을 건너뛰고 GITHUB_TOKEN 으로 fallback (기존 동작 유지).
+      # 게이트는 vars 로 판단 — secrets 컨텍스트는 if: 표현식에서 사용할 수 없어
+      # (Unrecognized named-value: 'secrets') 워크플로우가 startup 단계에서 invalid 처리된다.
       - name: Generate GitHub App token
         id: app-token
-        if: ${{ secrets.RELEASE_BOT_PRIVATE_KEY != '' }}
+        if: ${{ vars.RELEASE_BOT_APP_ID != '' }}
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ vars.RELEASE_BOT_APP_ID }}
