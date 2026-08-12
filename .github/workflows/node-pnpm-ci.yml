@@ -28,6 +28,17 @@ on:
         required: false
         type: string
         default: "."
+      # Which commit to check. Leave empty for the event default (PR merge ref).
+      #
+      # Needed when a job earlier in the same run pushed a commit — e.g. a review
+      # bot that auto-fixes findings. Commits pushed with GITHUB_TOKEN do not
+      # re-trigger workflows, so the only way to get CI onto that code is to order
+      # this job after the fix and point it at the resulting SHA.
+      ref:
+        description: "Commit/branch to check out (default: event default)"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   checks:
@@ -36,7 +47,10 @@ jobs:
       run:
         working-directory: ${{ inputs.working-directory }}
     steps:
+      # Empty ref behaves exactly like omitting it, so existing callers are unaffected.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       - uses: pnpm/action-setup@v4
 

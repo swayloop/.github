@@ -21,7 +21,7 @@ swayloop org의 공통 표준을 담는 메타 레포입니다.
 
 | Workflow | 하는 일 | caller 트리거 | 주요 입력/시크릿 |
 |---|---|---|---|
-| `node-pnpm-ci.yml` | Node/pnpm 공통 CI — `format:check`, lint, typecheck, build, test 를 package.json 에 스크립트가 있을 때만 실행 | PR | `node-version` (기본 20), `working-directory` |
+| `node-pnpm-ci.yml` | Node/pnpm 공통 CI — `format:check`, lint, typecheck, build, test 를 package.json 에 스크립트가 있을 때만 실행 | PR | `node-version` (기본 20), `working-directory`, `ref` (검사할 커밋, 기본은 이벤트 기본값) |
 | `pr-source-branch-check.yml` | main 으로의 PR 이 지정 브랜치(기본 `dev`)에서만 오도록 차단 | main 대상 PR | `allowed-source` (기본 dev) |
 | `auto-close-issues.yml` | PR 본문의 `Closes/Fixes/Resolves #N` 패턴으로 머지 시 이슈 자동 close | PR closed | `issues: write` 권한 |
 | `release-please.yml` | main push 시 릴리즈 PR 자동 생성 → 머지하면 태그 + Release + CHANGELOG | main push | `release-type` (기본 node) |
